@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OrthoPlanner v5 — Templating Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e1a;--s1:#111827;--s2:#1a2235;--s3:#1e293b;
+  --b1:#1e2d45;--b2:#2d3f5a;
+  --ac:#3b82f6;--ac2:#60a5fa;--ac3:#93c5fd;
+  --go:#f59e0b;--gr:#10b981;--re:#ef4444;--or:#f97316;--pu:#a78bfa;
+  --t1:#e2e8f0;--t2:#94a3b8;--t3:#64748b;
+  --ra:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font-size:13px;min-height:100vh;overflow:hidden;}
+::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:5px;}
+
+/* TOPBAR */
+.top{background:var(--s1);border-bottom:1px solid var(--b1);padding:0 16px;height:48px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.logo{display:flex;align-items:center;gap:9px;}
+.li{width:28px;height:28px;background:linear-gradient(135deg,var(--ac),#1d4ed8);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.lt{font-family:'Playfair Display',serif;font-size:16px;}
+.ls{font-size:9px;color:var(--t3);font-family:'IBM Plex Mono',monospace;letter-spacing:1px;text-transform:uppercase;}
+.bdg{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:var(--ac2);font-size:10px;font-family:'IBM Plex Mono',monospace;padding:2px 8px;border-radius:20px;}
+.bdg.g{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.3);color:var(--go);}
+
+/* BUTTONS */
+.btn{padding:5px 12px;border-radius:6px;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;border:none;display:inline-flex;align-items:center;gap:4px;}
+.bp{background:var(--ac);color:#fff;}.bp:hover{background:#2563eb;}
+.bg{background:transparent;color:var(--t2);border:1px solid var(--b2);}.bg:hover{background:var(--s2);color:var(--t1);}
+.bgo{background:rgba(245,158,11,.12);color:var(--go);border:1px solid rgba(245,158,11,.3);}
+.bgr{background:rgba(16,185,129,.12);color:var(--gr);border:1px solid rgba(16,185,129,.3);}
+.bsm{padding:3px 9px;font-size:11px;}
+
+/* LAYOUT */
+.wrap{display:grid;grid-template-columns:200px 1fr 270px;height:calc(100vh - 48px);}
+.side{background:var(--s1);border-right:1px solid var(--b1);overflow-y:auto;display:flex;flex-direction:column;}
+.main{display:flex;flex-direction:column;overflow:hidden;}
+.rpan{background:var(--s1);border-left:1px solid var(--b1);overflow-y:auto;padding:13px;display:flex;flex-direction:column;gap:12px;}
+
+/* PAGES */
+.pg{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.pg.on{display:flex;}
+.pscroll{flex:1;overflow-y:auto;padding:16px;}
+
+/* SIDEBAR NAV */
+.snl{font-size:9px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);padding:8px 14px 3px;}
+.sni{display:flex;align-items:center;gap:8px;padding:7px 14px;cursor:pointer;transition:all .15s;border-left:3px solid transparent;color:var(--t2);font-size:12px;}
+.sni:hover{background:var(--s2);color:var(--t1);}
+.sni.on{background:rgba(59,130,246,.1);color:var(--ac2);border-left-color:var(--ac);}
+
+/* SHARED */
+.sec{font-size:9px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-bottom:9px;display:flex;align-items:center;gap:8px;}
+.sec::after{content:'';flex:1;height:1px;background:var(--b1);}
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--ra);padding:13px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:11px;}
+.fc{display:flex;flex-direction:column;gap:3px;}
+label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;font-weight:500;}
+select,input[type=text],input[type=number],input[type=date],textarea{background:var(--bg);border:1px solid var(--b1);border-radius:5px;color:var(--t1);font-family:'IBM Plex Sans',sans-serif;font-size:12px;padding:5px 8px;outline:none;transition:border-color .2s;width:100%;}
+select:focus,input:focus,textarea:focus{border-color:var(--ac);}
+textarea{resize:vertical;min-height:52px;}
+.tabs{display:flex;border-bottom:1px solid var(--b1);padding:0 16px;flex-shrink:0;}
+.tab{padding:6px 12px;font-size:12px;font-weight:500;cursor:pointer;color:var(--t3);border-bottom:2px solid transparent;transition:all .15s;margin-bottom:-1px;}
+.tab:hover{color:var(--t2);}.tab.on{color:var(--ac2);border-bottom-color:var(--ac);}
+.ph{background:var(--s2);border-bottom:1px solid var(--b1);padding:8px 16px;display:flex;align-items:center;gap:11px;flex-shrink:0;}
+.pa{width:34px;height:34px;background:linear-gradient(135deg,#1d4ed8,var(--ac));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.hi{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:7px;padding:9px;font-size:11px;color:#fcd34d;line-height:1.5;margin-top:6px;}
+.fr{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:6px;}
+.frb{padding:5px 3px;border:1px solid var(--b1);border-radius:5px;background:var(--bg);color:var(--t2);font-size:10px;cursor:pointer;text-align:center;transition:all .15s;}
+.frb:hover{border-color:var(--ac);color:var(--ac2);}
+.frb.on{border-color:var(--ac);background:rgba(59,130,246,.12);color:var(--ac2);}
+.si{display:flex;align-items:flex-start;gap:9px;padding:7px 10px;background:var(--s2);border-radius:6px;border:1px solid var(--b1);margin-bottom:5px;}
+.sn{width:18px;height:18px;background:var(--ac);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;margin-top:1px;}
+.cr{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:5px;background:var(--s2);font-size:11px;margin-bottom:4px;}
+.cd{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.cd.ok{background:var(--gr);}.cd.w{background:var(--or);}.cd.e{background:var(--re);}
+.ct{flex:1;color:var(--t2);}
+.ctg{font-size:9px;font-family:'IBM Plex Mono',monospace;padding:1px 5px;border-radius:3px;}
+.ctg.ok{background:rgba(16,185,129,.15);color:var(--gr);}
+.ctg.w{background:rgba(249,115,22,.15);color:var(--or);}
+.ctg.e{background:rgba(239,68,68,.15);color:var(--re);}
+.dt{width:100%;border-collapse:collapse;font-size:12px;}
+.dt th{text-align:left;font-size:9px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;color:var(--t3);padding:6px 9px;border-bottom:1px solid var(--b1);}
+.dt td{padding:7px 9px;border-bottom:1px solid var(--b1);color:var(--t2);}
+.dt tr:hover td{background:var(--s2);}
+.sp{font-size:10px;padding:2px 6px;border-radius:20px;font-weight:500;}
+.sp.pl{background:rgba(59,130,246,.15);color:var(--ac2);}
+.sp.ur{background:rgba(239,68,68,.15);color:var(--re);}
+.sp.pe{background:rgba(245,158,11,.15);color:var(--go);}
+.notif{position:fixed;bottom:16px;right:16px;background:var(--s1);border:1px solid var(--gr);color:var(--gr);padding:8px 14px;border-radius:7px;font-size:12px;z-index:999;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;}
+.notif.on{opacity:1;transform:translateY(0);}
+
+/* ══════════════════════════════════
+   TEMPLATING
+══════════════════════════════════ */
+.tpl{display:flex;flex:1;overflow:hidden;}
+
+/* Implant shelf */
+.shelf{width:185px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--b1);overflow-y:auto;padding:8px;}
+.scat{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin:9px 0 4px;font-family:'IBM Plex Mono',monospace;}
+.ibt{border:1px solid var(--b1);border-radius:7px;padding:7px 6px;cursor:pointer;transition:all .18s;background:var(--bg);margin-bottom:5px;display:flex;align-items:center;gap:8px;user-select:none;}
+.ibt:hover{border-color:var(--ac2);background:rgba(59,130,246,.04);}
+.ibt.on{border-color:var(--ac);background:rgba(59,130,246,.14);box-shadow:0 0 0 2px rgba(59,130,246,.18);}
+.iprev{flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.iinfo{flex:1;min-width:0;}
+.iname{font-size:11px;color:var(--t2);font-weight:600;line-height:1.3;}
+.itag{font-size:9px;color:var(--t3);font-family:'IBM Plex Mono',monospace;}
+
+/* Screw section */
+.screw-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:4px;}
+.sbt{border:1px solid var(--b1);border-radius:6px;padding:6px 5px;cursor:pointer;transition:all .18s;background:var(--bg);text-align:center;user-select:none;}
+.sbt:hover{border-color:var(--ac2);}
+.sbt.on{border-color:var(--ac);background:rgba(59,130,246,.14);}
+.sbt canvas{display:block;margin:0 auto 3px;}
+.sbt-name{font-size:10px;color:var(--t2);font-weight:600;line-height:1.2;}
+.sbt-tag{font-size:9px;color:var(--t3);font-family:'IBM Plex Mono',monospace;}
+
+/* Canvas col */
+.ccol{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.tb{background:var(--s1);border-bottom:1px solid var(--b1);padding:6px 10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex-shrink:0;}
+.tl{font-size:9px;color:var(--t3);font-family:'IBM Plex Mono',monospace;white-space:nowrap;}
+.tbb{padding:3px 8px;border-radius:5px;font-size:11px;cursor:pointer;border:1px solid var(--b2);background:var(--bg);color:var(--t2);transition:all .15s;white-space:nowrap;}
+.tbb:hover{background:var(--s2);color:var(--t1);}
+.tbb.on{background:rgba(59,130,246,.15);border-color:var(--ac);color:var(--ac2);}
+.tsep{width:1px;height:16px;background:var(--b2);margin:0 2px;}
+.csw{width:15px;height:15px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;}
+.csw.on{border-color:#fff;transform:scale(1.2);}
+
+.cf{flex:1;position:relative;overflow:hidden;background:#0d1117;cursor:crosshair;}
+#tpl{display:block;position:absolute;top:0;left:0;}
+.noimg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;pointer-events:none;}
+.noimg.h{display:none;}
+
+/* Transform bar */
+.txb{background:rgba(10,14,26,.95);border-top:1px solid var(--b2);padding:7px 12px;display:flex;align-items:center;gap:9px;flex-shrink:0;flex-wrap:wrap;}
+.txb.h{display:none;}
+.txl{font-size:9px;color:var(--t3);font-family:'IBM Plex Mono',monospace;white-space:nowrap;}
+input[type=range]{accent-color:var(--ac);width:80px;}
+.txv{font-size:10px;color:var(--ac2);font-family:'IBM Plex Mono',monospace;min-width:36px;}
+
+/* RX strip */
+.rxs{background:var(--s1);border-top:1px solid var(--b1);padding:6px 8px;display:flex;gap:6px;overflow-x:auto;flex-shrink:0;align-items:center;}
+.rxt{flex-shrink:0;width:58px;height:48px;border:2px solid var(--b1);border-radius:5px;overflow:hidden;cursor:pointer;position:relative;}
+.rxt:hover{border-color:var(--ac2);}
+.rxt.on{border-color:var(--ac);}
+.rxt img{width:100%;height:100%;object-fit:cover;display:block;}
+.rxt .x{position:absolute;top:1px;right:1px;background:rgba(0,0,0,.75);border:none;color:var(--re);font-size:9px;width:14px;height:14px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;}
+.rxt:hover .x{opacity:1;}
+.rxadd{flex-shrink:0;width:58px;height:48px;border:2px dashed var(--b2);border-radius:5px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--t3);position:relative;}
+.rxadd:hover{border-color:var(--ac);color:var(--ac2);}
+.rxadd input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="top">
+  <div class="logo">
+    <div class="li">🦴</div>
+    <div><div class="lt">OrthoPlanner</div><div class="ls">Templating · v5.0</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:7px;">
+    <span class="bdg">AO/OTA 2018</span>
+    <span class="bdg g">✦ Templating v5</span>
+    <button class="btn bg" onclick="showPg('lista')">📋 Casos</button>
+    <button class="btn bp" onclick="novoPlano()">+ Novo</button>
+  </div>
+</div>
+
+<div class="wrap">
+<!-- SIDEBAR -->
+<nav class="side">
+  <div class="snl">Módulos</div>
+  <div class="sni on" id="sn0" onclick="showPg('plan');setA(this)"><span>📐</span> Planejamento</div>
+  <div class="sni" id="sn1" onclick="showPg('tpl');setA(this)"><span>✦</span> Templating Digital</div>
+  <div class="sni" id="sn2" onclick="showPg('lista');setA(this)"><span>📋</span> Casos</div>
+  <div class="snl" style="margin-top:6px;">Regiões</div>
+  <div class="sni" onclick="setReg('Fêmur Proximal')"><span>🟡</span> Fêmur Proximal</div>
+  <div class="sni" onclick="setReg('Quadril / Acetábulo')"><span>🟡</span> Acetábulo</div>
+  <div class="sni" onclick="setReg('Fêmur Diáfise')"><span>🔵</span> Fêmur Diáfise</div>
+  <div class="sni" onclick="setReg('Platô Tibial')"><span>🟢</span> Platô Tibial</div>
+  <div class="sni" onclick="setReg('Tornozelo / Pilão')"><span>🟢</span> Tornozelo</div>
+  <div class="sni" onclick="setReg('Úmero Proximal')"><span>🟠</span> Úmero Proximal</div>
+  <div class="sni" onclick="setReg('Pelve / Anel Pélvico')"><span>🟡</span> Pelve</div>
+  <div class="snl" style="margin-top:6px;">Exportar</div>
+  <div class="sni" onclick="exportImg()"><span>📸</span> Exportar imagem</div>
+  <div class="sni" onclick="gerarPDF()"><span>📄</span> Relatório PDF</div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ══ PLANEJAMENTO ══ -->
+<div id="pg-plan" class="pg on">
+  <div class="ph">
+    <div class="pa">👤</div>
+    <div style="flex:1">
+      <div style="font-size:14px;font-weight:600;" id="dn">Novo Paciente</div>
+      <div style="display:flex;gap:10px;margin-top:2px;flex-wrap:wrap;">
+        <span style="font-size:11px;color:var(--t2);">🏥 <span id="dr">Fêmur Proximal</span></span>
+        <span style="font-size:11px;color:var(--t2);">· 📅 <span id="dd">—</span></span>
+        <span style="font-size:11px;color:var(--t2);">· 🩺 <span id="dc">—</span></span>
+      </div>
+    </div>
+    <button class="btn bgo" onclick="showPg('tpl');setA(document.getElementById('sn1'))">✦ Templating</button>
+    <button class="btn bp" onclick="salvar()">💾 Salvar</button>
+  </div>
+  <div class="tabs">
+    <div class="tab on" onclick="stab(this,'td')">Dados</div>
+    <div class="tab" onclick="stab(this,'tf')">Fratura</div>
+    <div class="tab" onclick="stab(this,'ti')">Implantes</div>
+    <div class="tab" onclick="stab(this,'tp')">Passos</div>
+  </div>
+  <div class="pscroll">
+    <!-- DADOS -->
+    <div id="td">
+      <div class="g2">
+        <div class="card">
+          <div style="font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;margin-bottom:9px;">Paciente</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+            <div class="fc"><label>Nome</label><input type="text" id="pnome" placeholder="Nome completo" oninput="upH()"></div>
+            <div class="fc"><label>Idade</label><input type="number" id="pidade" placeholder="anos" oninput="upH()"></div>
+            <div class="fc"><label>Sexo</label><select><option>Masculino</option><option>Feminino</option></select></div>
+            <div class="fc"><label>Peso (kg)</label><input type="number" placeholder="kg"></div>
+            <div class="fc"><label>Prontuário</label><input type="text" id="ppront"></div>
+            <div class="fc"><label>Data trauma</label><input type="date"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;margin-bottom:9px;">Cirurgia</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+            <div class="fc"><label>Cirurgião</label><input type="text" id="pcir" placeholder="Dr(a)." oninput="upH()"></div>
+            <div class="fc"><label>Data prevista</label><input type="date" id="pdcir" oninput="upH()"></div>
+            <div class="fc"><label>Lateralidade</label><select><option>Direito</option><option>Esquerdo</option><option>Bilateral</option></select></div>
+            <div class="fc"><label>Urgência</label><select id="purg" onchange="upRisk()"><option>Eletiva</option><option>Urgência</option><option>Emergência</option></select></div>
+          </div>
+          <div class="fc" style="margin-top:7px;"><label>Região</label>
+            <select id="preg" onchange="setRegSel()">
+              <option>Fêmur Proximal</option><option>Quadril / Acetábulo</option><option>Fêmur Diáfise</option>
+              <option>Platô Tibial</option><option>Tornozelo / Pilão</option><option>Úmero Proximal</option>
+              <option>Antebraço</option><option>Pelve / Anel Pélvico</option><option>Clavícula</option>
+              <option>Cotovelo</option><option>Punho / Rádio Distal</option><option>Tíbia Diáfise</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div style="font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;margin-bottom:8px;">Comorbidades</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <label style="display:flex;gap:6px;align-items:center;text-transform:none;font-size:12px;cursor:pointer;"><input type="checkbox" id="cdm" onchange="upRisk()"> Diabetes</label>
+            <label style="display:flex;gap:6px;align-items:center;text-transform:none;font-size:12px;cursor:pointer;"><input type="checkbox" id="chta" onchange="upRisk()"> HAS</label>
+            <label style="display:flex;gap:6px;align-items:center;text-transform:none;font-size:12px;cursor:pointer;"><input type="checkbox" id="costeo" onchange="upRisk()"> Osteoporose</label>
+            <label style="display:flex;gap:6px;align-items:center;text-transform:none;font-size:12px;cursor:pointer;"><input type="checkbox" id="cantic" onchange="upRisk()"> Anticoagulante</label>
+            <label style="display:flex;gap:6px;align-items:center;text-transform:none;font-size:12px;cursor:pointer;"><input type="checkbox" id="circ" onchange="upRisk()"> D. Renal</label>
+            <label style="display:flex;gap:6px;align-items:center;text-transform:none;font-size:12px;cursor:pointer;"><input type="checkbox" id="cobes" onchange="upRisk()"> Obesidade</label>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;margin-bottom:7px;">Observações</div>
+          <textarea id="pobs" placeholder="Estado neurológico, vascular, partes moles..." style="min-height:88px;"></textarea>
+        </div>
+      </div>
+    </div>
+    <!-- FRATURA -->
+    <div id="tf" style="display:none">
+      <div class="g2">
+        <div class="card">
+          <div style="font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;margin-bottom:8px;">Código AO/OTA</div>
+          <div class="fc" style="margin-bottom:8px;"><label>Código</label><input type="text" id="pao" placeholder="Ex: 31-A2.1" oninput="interpAO()"></div>
+          <div id="aobox" class="hi" style="display:none;"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px;">
+            <div class="fc"><label>Tipo</label><select id="ptipo" onchange="upRisk()"><option value="">—</option><option value="A">A — Extra-articular</option><option value="B">B — Parcial</option><option value="C">C — Total</option></select></div>
+            <div class="fc"><label>Subtipo</label><select><option>1 — Simples</option><option>2 — Cominuta</option><option>3 — Complexa</option></select></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;margin-bottom:8px;">Gustilo-Anderson</div>
+          <div class="fc" style="margin-bottom:8px;"><label>Partes moles</label>
+            <select id="pgust" onchange="upRisk()"><option value="0">Fechada</option><option value="1">Gustilo I</option><option value="2">Gustilo II</option><option value="3A">Gustilo IIIA</option><option value="3B">Gustilo IIIB</option><option value="3C">Gustilo IIIC</option></select>
+          </div>
+          <div class="fc"><label>Mecanismo</label><select><option>Queda da própria altura</option><option>Queda de altura</option><option>Acidente automobilístico</option><option>Atropelamento</option><option>Esmagamento</option><option>PAF</option></select></div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:10px;">
+        <div style="font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;margin-bottom:6px;">Localização</div>
+        <div id="freg" class="fr"></div>
+      </div>
+    </div>
+    <!-- IMPLANTES -->
+    <div id="ti" style="display:none">
+      <div class="card" style="margin-bottom:10px;">
+        <div style="font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;margin-bottom:8px;">Fixação principal</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;">
+          <div style="border:1px solid var(--ac);border-radius:7px;padding:8px;cursor:pointer;text-align:center;background:rgba(59,130,246,.1);" class="iqc" onclick="selQI(this)"><div style="font-size:16px;">📌</div><div style="font-size:10px;color:var(--t2);font-weight:500;">Haste IM</div></div>
+          <div style="border:1px solid var(--b1);border-radius:7px;padding:8px;cursor:pointer;text-align:center;background:var(--bg);" class="iqc" onclick="selQI(this)"><div style="font-size:16px;">🔩</div><div style="font-size:10px;color:var(--t2);font-weight:500;">Placa</div></div>
+          <div style="border:1px solid var(--b1);border-radius:7px;padding:8px;cursor:pointer;text-align:center;background:var(--bg);" class="iqc" onclick="selQI(this)"><div style="font-size:16px;">⚙️</div><div style="font-size:10px;color:var(--t2);font-weight:500;">DHS/DCS</div></div>
+          <div style="border:1px solid var(--b1);border-radius:7px;padding:8px;cursor:pointer;text-align:center;background:var(--bg);" class="iqc" onclick="selQI(this)"><div style="font-size:16px;">🏗️</div><div style="font-size:10px;color:var(--t2);font-weight:500;">Fix. Externa</div></div>
+          <div style="border:1px solid var(--b1);border-radius:7px;padding:8px;cursor:pointer;text-align:center;background:var(--bg);" class="iqc" onclick="selQI(this)"><div style="font-size:16px;">🦾</div><div style="font-size:10px;color:var(--t2);font-weight:500;">Prótese</div></div>
+          <div style="border:1px solid var(--b1);border-radius:7px;padding:8px;cursor:pointer;text-align:center;background:var(--bg);" class="iqc" onclick="selQI(this)"><div style="font-size:16px;">🧷</div><div style="font-size:10px;color:var(--t2);font-weight:500;">Fio K</div></div>
+        </div>
+        <button class="btn bgo" style="margin-top:10px;width:100%;justify-content:center;" onclick="showPg('tpl');setA(document.getElementById('sn1'))">✦ Abrir Templating Visual</button>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div style="font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;margin-bottom:8px;">Especificações</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+            <div class="fc"><label>Fabricante</label><select><option>DePuy Synthes</option><option>Stryker</option><option>Zimmer Biomet</option><option>Smith & Nephew</option><option>Braile Biomédica</option></select></div>
+            <div class="fc"><label>Comprimento (mm)</label><input type="number" placeholder="mm"></div>
+            <div class="fc"><label>Diâmetro (mm)</label><input type="number" placeholder="mm" step="0.5"></div>
+            <div class="fc"><label>Nº parafusos</label><input type="number" placeholder="0"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;margin-bottom:7px;">Material adicional</div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label style="display:flex;gap:6px;align-items:center;text-transform:none;font-size:12px;cursor:pointer;"><input type="checkbox"> Enxerto autólogo</label>
+            <label style="display:flex;gap:6px;align-items:center;text-transform:none;font-size:12px;cursor:pointer;"><input type="checkbox"> Enxerto alogênico</label>
+            <label style="display:flex;gap:6px;align-items:center;text-transform:none;font-size:12px;cursor:pointer;"><input type="checkbox"> Substituto ósseo</label>
+            <label style="display:flex;gap:6px;align-items:center;text-transform:none;font-size:12px;cursor:pointer;"><input type="checkbox"> Cimento + ATB</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- PASSOS -->
+    <div id="tp" style="display:none">
+      <div class="g2" style="margin-bottom:10px;">
+        <div class="card">
+          <div style="font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;margin-bottom:8px;">Acesso</div>
+          <div class="fc" style="margin-bottom:6px;"><label>Posição</label><select><option>Decúbito dorsal</option><option>Decúbito lateral</option><option>Decúbito ventral</option><option>Mesa ortopédica</option></select></div>
+          <div class="fc" style="margin-bottom:6px;"><label>Via de acesso</label><select><option>Lateral trocantérica</option><option>Anterolateral</option><option>Posterior (Moore)</option><option>Anterior (DAA)</option><option>Ilioinguinal</option><option>Kocher-Langenbeck</option><option>Percutâneo / MIPO</option></select></div>
+          <div class="fc"><label>Redução</label><select><option>Fechada</option><option>Aberta (RAFI)</option><option>Percutânea</option><option>Ligamentotaxia</option></select></div>
+        </div>
+        <div class="card">
+          <div style="font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;margin-bottom:7px;">Recursos intraop.</div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <label style="display:flex;gap:6px;align-items:center;text-transform:none;font-size:12px;cursor:pointer;"><input type="checkbox" checked> Fluoroscopia</label>
+            <label style="display:flex;gap:6px;align-items:center;text-transform:none;font-size:12px;cursor:pointer;"><input type="checkbox"> TC intraop. (O-arm)</label>
+            <label style="display:flex;gap:6px;align-items:center;text-transform:none;font-size:12px;cursor:pointer;"><input type="checkbox"> Navegação cirúrgica</label>
+            <label style="display:flex;gap:6px;align-items:center;text-transform:none;font-size:12px;cursor:pointer;"><input type="checkbox"> Mesa ortopédica</label>
+          </div>
+        </div>
+      </div>
+      <div class="sec">Passos</div>
+      <div id="sbox"></div>
+      <button class="btn bg" style="margin-top:7px;width:100%;justify-content:center;" onclick="addStep()">+ Adicionar</button>
+    </div>
+    <div style="display:flex;gap:7px;margin-top:12px;justify-content:flex-end;">
+      <button class="btn bg" onclick="limpar()">🔄 Limpar</button>
+      <button class="btn bp" onclick="salvar()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TEMPLATING ══ -->
+<div id="pg-tpl" class="pg">
+  <div class="tpl">
+
+    <!-- Shelf -->
+    <div class="shelf">
+      <div style="font-size:9px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);margin-bottom:6px;">Implantes</div>
+      <p style="font-size:10px;color:var(--t3);margin-bottom:7px;line-height:1.4;">Clique → posicione na RX</p>
+
+      <!-- HASTES -->
+      <div class="scat">Hastes IM</div>
+      <div class="ibt" id="ib-cefalo" onclick="pickObj('cefalo')">
+        <div class="iprev"><canvas id="pv-cefalo" width="28" height="52"></canvas></div>
+        <div class="iinfo"><div class="iname">Cefalomedular</div><div class="itag">TFN-A/Gamma3</div></div>
+      </div>
+      <div class="ibt" id="ib-haste-fem" onclick="pickObj('haste-fem')">
+        <div class="iprev"><canvas id="pv-haste-fem" width="24" height="52"></canvas></div>
+        <div class="iinfo"><div class="iname">Haste Femoral</div><div class="itag">Retrógrada</div></div>
+      </div>
+      <div class="ibt" id="ib-haste-tib" onclick="pickObj('haste-tib')">
+        <div class="iprev"><canvas id="pv-haste-tib" width="22" height="52"></canvas></div>
+        <div class="iinfo"><div class="iname">Haste Tibial</div><div class="itag">Expert Nail</div></div>
+      </div>
+
+      <!-- PLACAS LCP/PHILOS -->
+      <div class="scat">Placas LCP</div>
+      <div class="ibt" id="ib-philos" onclick="pickObj('philos')">
+        <div class="iprev"><canvas id="pv-philos" width="42" height="52"></canvas></div>
+        <div class="iinfo"><div class="iname">Placa PHILOS</div><div class="itag">Úmero proximal</div></div>
+      </div>
+      <div class="ibt" id="ib-lcp-ret" onclick="pickObj('lcp-ret')">
+        <div class="iprev"><canvas id="pv-lcp-ret" width="52" height="18"></canvas></div>
+        <div class="iinfo"><div class="iname">LCP Reta</div><div class="itag">Bloqueio angular</div></div>
+      </div>
+      <div class="ibt" id="ib-lcp-curv" onclick="pickObj('lcp-curv')">
+        <div class="iprev"><canvas id="pv-lcp-curv" width="52" height="22"></canvas></div>
+        <div class="iinfo"><div class="iname">LCP Curva</div><div class="itag">Periarticular</div></div>
+      </div>
+      <div class="ibt" id="ib-joelho" onclick="pickObj('joelho')">
+        <div class="iprev"><canvas id="pv-joelho" width="42" height="52"></canvas></div>
+        <div class="iinfo"><div class="iname">Placa Joelho</div><div class="itag">Periarticular distal</div></div>
+      </div>
+
+      <!-- PLACAS COMPRESSÃO -->
+      <div class="scat">Compressão / Neutro</div>
+      <div class="ibt" id="ib-dcp" onclick="pickObj('dcp')">
+        <div class="iprev"><canvas id="pv-dcp" width="52" height="16"></canvas></div>
+        <div class="iinfo"><div class="iname">DCP</div><div class="itag">Compressão dinâmica</div></div>
+      </div>
+      <div class="ibt" id="ib-lcdcp" onclick="pickObj('lcdcp')">
+        <div class="iprev"><canvas id="pv-lcdcp" width="52" height="16"></canvas></div>
+        <div class="iinfo"><div class="iname">LC-DCP</div><div class="itag">Contato limitado</div></div>
+      </div>
+      <div class="ibt" id="ib-neutr" onclick="pickObj('neutr')">
+        <div class="iprev"><canvas id="pv-neutr" width="52" height="16"></canvas></div>
+        <div class="iinfo"><div class="iname">Neutralização</div><div class="itag">3.5 / 4.5 mm</div></div>
+      </div>
+      <div class="ibt" id="ib-bridge" onclick="pickObj('bridge')">
+        <div class="iprev"><canvas id="pv-bridge" width="52" height="16"></canvas></div>
+        <div class="iinfo"><div class="iname">Placa Ponte</div><div class="itag">Bridging</div></div>
+      </div>
+      <div class="ibt" id="ib-buttress" onclick="pickObj('buttress')">
+        <div class="iprev"><canvas id="pv-buttress" width="34" height="52"></canvas></div>
+        <div class="iinfo"><div class="iname">Suporte (Buttress)</div><div class="itag">Platô tibial</div></div>
+      </div>
+
+      <!-- PLACAS ESPECIAIS -->
+      <div class="scat">Especiais</div>
+      <div class="ibt" id="ib-clav" onclick="pickObj('clav')">
+        <div class="iprev"><canvas id="pv-clav" width="52" height="18"></canvas></div>
+        <div class="iinfo"><div class="iname">Placa Clavícula</div><div class="itag">Superior / ântero-inf.</div></div>
+      </div>
+      <div class="ibt" id="ib-pilao" onclick="pickObj('pilao')">
+        <div class="iprev"><canvas id="pv-pilao" width="34" height="52"></canvas></div>
+        <div class="iinfo"><div class="iname">Placa Pilão</div><div class="itag">Tibial distal</div></div>
+      </div>
+      <div class="ibt" id="ib-recon" onclick="pickObj('recon')">
+        <div class="iprev"><canvas id="pv-recon" width="52" height="22"></canvas></div>
+        <div class="iinfo"><div class="iname">Recon. Pélvica</div><div class="itag">Acetábulo / Pelve</div></div>
+      </div>
+      <div class="ibt" id="ib-dhs" onclick="pickObj('dhs')">
+        <div class="iprev"><canvas id="pv-dhs" width="52" height="36"></canvas></div>
+        <div class="iinfo"><div class="iname">DHS 135°</div><div class="itag">Fêmur proximal</div></div>
+      </div>
+
+      <!-- PRÓTESES -->
+      <div class="scat">Próteses</div>
+      <div class="ibt" id="ib-ptq" onclick="pickObj('ptq')">
+        <div class="iprev"><canvas id="pv-ptq" width="38" height="52"></canvas></div>
+        <div class="iinfo"><div class="iname">Prótese Total</div><div class="itag">Quadril</div></div>
+      </div>
+      <div class="ibt" id="ib-ptqp" onclick="pickObj('ptqp')">
+        <div class="iprev"><canvas id="pv-ptqp" width="34" height="52"></canvas></div>
+        <div class="iinfo"><div class="iname">Prótese Parcial</div><div class="itag">Austin-Moore</div></div>
+      </div>
+
+      <!-- PARAFUSOS -->
+      <div class="scat">Parafusos Isolados</div>
+      <div class="screw-grid">
+        <div class="sbt" id="sb-cortical" onclick="pickObj('sc-cortical')">
+          <canvas id="pv-sc-cortical" width="14" height="40"></canvas>
+          <div class="sbt-name">Cortical</div><div class="sbt-tag">3.5/4.5mm</div>
+        </div>
+        <div class="sbt" id="sb-locking" onclick="pickObj('sc-locking')">
+          <canvas id="pv-sc-locking" width="14" height="40"></canvas>
+          <div class="sbt-name">Bloqueio</div><div class="sbt-tag">Locking</div>
+        </div>
+        <div class="sbt" id="sb-esponj" onclick="pickObj('sc-esponj')">
+          <canvas id="pv-sc-esponj" width="14" height="40"></canvas>
+          <div class="sbt-name">Esponjoso</div><div class="sbt-tag">6.5/7.3mm</div>
+        </div>
+        <div class="sbt" id="sb-canuled" onclick="pickObj('sc-canuled')">
+          <canvas id="pv-sc-canuled" width="14" height="40"></canvas>
+          <div class="sbt-name">Canulado</div><div class="sbt-tag">7.3mm</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canvas col -->
+    <div class="ccol">
+      <!-- Toolbar -->
+      <div class="tb">
+        <span class="tl">MODO:</span>
+        <button class="tbb on" id="m-obj" onclick="setMode('obj')">✦ Obj.</button>
+        <button class="tbb" id="m-draw" onclick="setMode('draw')">✏️ Livre</button>
+        <button class="tbb" id="m-line" onclick="setMode('line')">╱ Linha</button>
+        <button class="tbb" id="m-angle" onclick="setMode('angle')">📐 Ângulo</button>
+        <button class="tbb" id="m-meas" onclick="setMode('meas')">📏 Medir</button>
+        <button class="tbb" id="m-txt" onclick="setMode('txt')">T Texto</button>
+        <div class="tsep"></div>
+        <span class="tl">COR:</span>
+        <div class="csw on" style="background:#ef4444" onclick="setDC('#ef4444',this)"></div>
+        <div class="csw" style="background:#f59e0b" onclick="setDC('#f59e0b',this)"></div>
+        <div class="csw" style="background:#10b981" onclick="setDC('#10b981',this)"></div>
+        <div class="csw" style="background:#60a5fa" onclick="setDC('#60a5fa',this)"></div>
+        <div class="csw" style="background:#fff" onclick="setDC('#fff',this)"></div>
+        <div class="tsep"></div>
+        <span class="tl">ESP:</span>
+        <input type="number" id="dsz" value="2" min="1" max="20" style="width:40px;padding:2px 5px;font-size:11px;">
+        <div class="tsep"></div>
+        <span class="tl">OVERLAY:</span>
+        <button class="tbb on" id="ov-solid" onclick="setOv('solid')">Sólido</button>
+        <button class="tbb" id="ov-ghost" onclick="setOv('ghost')">Fantasma</button>
+        <button class="tbb" id="ov-outline" onclick="setOv('outline')">Contorno</button>
+        <div class="tsep"></div>
+        <button class="tbb" onclick="undo()">↩</button>
+        <button class="tbb" onclick="clearAll()">🗑</button>
+        <button class="tbb" style="margin-left:auto;" onclick="exportImg()">📸 Exportar</button>
+      </div>
+
+      <!-- Canvas frame -->
+      <div class="cf" id="cf">
+        <canvas id="tpl"></canvas>
+        <div class="noimg" id="noimg">
+          <div style="font-size:38px;">📡</div>
+          <div style="font-size:14px;font-weight:600;">Carregue uma radiografia</div>
+          <div style="font-size:11px;color:var(--t2);">Use o botão + na tira abaixo</div>
+        </div>
+      </div>
+
+      <!-- Transform bar (shown when object selected) -->
+      <div class="txb h" id="txb">
+        <span class="txl" id="txb-name">—</span>
+        <div class="tsep"></div>
+        <span class="txl">TAM:</span>
+        <input type="range" id="isc" min="0.1" max="5" step="0.05" value="1" oninput="applyTx()">
+        <span class="txv" id="isc-v">100%</span>
+        <div class="tsep"></div>
+        <span class="txl">ROT:</span>
+        <input type="range" id="iro" min="-180" max="180" step="1" value="0" oninput="applyTx()">
+        <span class="txv" id="iro-v">0°</span>
+        <div class="tsep"></div>
+        <button class="tbb" id="fl-btn" onclick="flipObj()">⇄ Espelhar</button>
+        <button class="tbb" onclick="bakeObj()">✓ Fixar</button>
+        <button class="tbb" onclick="deleteObj()">✕ Remover</button>
+        <button class="tbb" style="margin-left:auto;" onclick="duplicateObj()">⊕ Duplicar</button>
+      </div>
+
+      <!-- RX strip -->
+      <div class="rxs" id="rxs">
+        <div class="rxadd"><input type="file" accept="image/*" multiple onchange="addImgs(this.files)">+</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Measurements row -->
+  <div id="measrow" style="display:none;background:var(--s1);border-top:1px solid var(--b1);padding:7px 12px;flex-shrink:0;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+      <span style="font-size:9px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);">Medições</span>
+      <button class="btn bg bsm" onclick="clrMeas()">Limpar</button>
+    </div>
+    <div id="measlist" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
+  </div>
+</div>
+
+<!-- ══ LISTA ══ -->
+<div id="pg-lista" class="pg">
+  <div class="pscroll">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <h2 style="font-size:16px;">Casos Planejados</h2>
+      <button class="btn bp" onclick="novoPlano()">+ Novo</button>
+    </div>
+    <div class="card">
+      <table class="dt">
+        <thead><tr><th>Paciente</th><th>Região</th><th>AO</th><th>Data</th><th>Cirurgião</th><th>Status</th><th></th></tr></thead>
+        <tbody id="ctb"><tr><td colspan="7" style="text-align:center;color:var(--t3);padding:20px;">Nenhum caso.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- RIGHT PANEL -->
+<aside class="rpan">
+  <div>
+    <div class="sec">Complexidade</div>
+    <div style="display:flex;flex-direction:column;align-items:center;padding:11px;background:var(--s2);border-radius:var(--ra);border:1px solid var(--b1);">
+      <div id="gc" style="width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:6px;background:conic-gradient(var(--gr) 0deg 75deg, var(--b1) 75deg 360deg);">
+        <div style="width:58px;height:58px;background:var(--s2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+          <div id="gv" style="font-size:19px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--gr);line-height:1;">25</div>
+          <div style="font-size:8px;color:var(--t3);">/100</div>
+        </div>
+      </div>
+      <div style="font-size:12px;font-weight:600;" id="gt">Baixo</div>
+      <div style="font-size:10px;color:var(--t2);text-align:center;" id="gs">Protocolo padrão</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec">Objeto Ativo</div>
+    <div id="rp-obj" style="padding:9px;background:var(--s2);border-radius:7px;border:1px solid var(--b1);font-size:11px;color:var(--t3);text-align:center;">Nenhum</div>
+  </div>
+
+  <div>
+    <div class="sec">Objetos no Canvas</div>
+    <div id="obj-list" style="display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto;">
+      <div style="font-size:11px;color:var(--t3);text-align:center;padding:8px;">Vazio</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec">Checklist</div>
+    <div class="cr"><div class="cd ok"></div><span class="ct">Consentimento</span><span class="ctg ok">OK</span></div>
+    <div class="cr"><div class="cd ok"></div><span class="ct">Tipagem</span><span class="ctg ok">OK</span></div>
+    <div class="cr"><div class="cd w"></div><span class="ct">Avaliação cardio</span><span class="ctg w">PEND.</span></div>
+    <div class="cr"><div class="cd w"></div><span class="ct">TC pré-op</span><span class="ctg w">PEND.</span></div>
+    <div class="cr"><div class="cd ok"></div><span class="ct">Implante reservado</span><span class="ctg ok">OK</span></div>
+    <div class="cr"><div class="cd e"></div><span class="ct">Reserva hemoc.</span><span class="ctg e">FALTA</span></div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:6px;">
+    <button class="btn bgr" onclick="exportImg()" style="width:100%;justify-content:center;">📸 Exportar</button>
+    <button class="btn bgo" onclick="gerarPDF()" style="width:100%;justify-content:center;">📄 Relatório PDF</button>
+    <button class="btn bp" onclick="salvar()" style="width:100%;justify-content:center;">💾 Salvar</button>
+  </div>
+</aside>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════════════════════════
+//  IMPLANT + SCREW DEFINITIONS
+// ═══════════════════════════════════════════════════════════════
+const DEFS = {
+  // HASTES
+  'cefalo':    {name:'Haste Cefalomedular', cat:'haste', pw:28, ph:52, cw:60, ch:130},
+  'haste-fem': {name:'Haste Femoral Retrógrada', cat:'haste', pw:24, ph:52, cw:48, ch:140},
+  'haste-tib': {name:'Haste Tibial', cat:'haste', pw:22, ph:52, cw:44, ch:145},
+  // PLACAS LCP
+  'philos':    {name:'Placa PHILOS', cat:'placa', pw:42, ph:52, cw:80, ch:130},
+  'lcp-ret':   {name:'Placa LCP Reta', cat:'placa', pw:52, ph:18, cw:210, ch:44},
+  'lcp-curv':  {name:'Placa LCP Curva', cat:'placa', pw:52, ph:22, cw:210, ch:50},
+  'joelho':    {name:'Placa Periarticular Joelho', cat:'placa', pw:42, ph:52, cw:80, ch:130},
+  // COMPRESSÃO
+  'dcp':       {name:'Placa DCP', cat:'placa', pw:52, ph:16, cw:210, ch:38},
+  'lcdcp':     {name:'Placa LC-DCP', cat:'placa', pw:52, ph:16, cw:210, ch:38},
+  'neutr':     {name:'Placa de Neutralização', cat:'placa', pw:52, ph:16, cw:210, ch:38},
+  'bridge':    {name:'Placa Ponte (Bridge)', cat:'placa', pw:52, ph:16, cw:260, ch:38},
+  'buttress':  {name:'Placa de Suporte (Buttress)', cat:'placa', pw:34, ph:52, cw:62, ch:130},
+  // ESPECIAIS
+  'clav':      {name:'Placa de Clavícula', cat:'placa', pw:52, ph:18, cw:200, ch:42},
+  'pilao':     {name:'Placa de Pilão Tibial', cat:'placa', pw:34, ph:52, cw:64, ch:130},
+  'recon':     {name:'Placa Reconstrução Pélvica', cat:'placa', pw:52, ph:22, cw:220, ch:55},
+  'dhs':       {name:'DHS 135°', cat:'dhs', pw:52, ph:36, cw:130, ch:90},
+  // PRÓTESES
+  'ptq':       {name:'Prótese Total Quadril', cat:'protese', pw:38, ph:52, cw:82, ch:152},
+  'ptqp':      {name:'Prótese Parcial Quadril', cat:'protese', pw:34, ph:52, cw:70, ch:148},
+  // PARAFUSOS
+  'sc-cortical':{name:'Parafuso Cortical 3.5/4.5mm', cat:'screw', pw:14, ph:40, cw:12, ch:60},
+  'sc-locking': {name:'Parafuso de Bloqueio', cat:'screw', pw:14, ph:40, cw:12, ch:60},
+  'sc-esponj':  {name:'Parafuso Esponjoso 6.5/7.3mm', cat:'screw', pw:14, ph:40, cw:14, ch:60},
+  'sc-canuled': {name:'Parafuso Canulado 7.3mm', cat:'screw', pw:14, ph:40, cw:14, ch:60},
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  DRAWING FUNCTIONS (pure Canvas 2D, no SVG, no Blob)
+// ═══════════════════════════════════════════════════════════════
+function getColors(mode) {
+  if (mode==='solid')   return {fill:'rgba(59,130,246,0.82)', fill2:'rgba(147,197,253,0.88)', stroke:'rgba(29,78,216,0.95)', cup:'rgba(129,140,248,0.72)', lw:1.2};
+  if (mode==='ghost')   return {fill:'rgba(59,130,246,0.18)', fill2:'rgba(147,197,253,0.25)', stroke:'rgba(59,130,246,0.6)', cup:'rgba(129,140,248,0.3)', lw:1.2};
+  if (mode==='outline') return {fill:'rgba(0,0,0,0)', fill2:'rgba(0,0,0,0)', stroke:'rgba(96,165,250,1)', cup:'rgba(167,139,250,1)', lw:2.5};
+}
+
+function rr(ctx,x,y,w,h,r=4,fill,stroke,lw=1.2){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);
+  ctx.closePath();
+  if(fill){ctx.fillStyle=fill;ctx.fill();}
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke();}
+}
+function circ(ctx,x,y,r,fill,stroke,lw=1){
+  ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
+  if(fill){ctx.fillStyle=fill;ctx.fill();}
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lw;ctx.stroke();}
+}
+function ln(ctx,x1,y1,x2,y2,color,lw){
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);
+  ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.stroke();
+}
+
+function drawShape(ctx, key, mode, W, H) {
+  const c = getColors(mode);
+  const def = DEFS[key];
+  if (!def) return;
+  const sx = W/def.cw, sy = H/def.ch;
+  ctx.save(); ctx.scale(sx,sy);
+  ctx.lineCap='round'; ctx.lineJoin='round';
+
+  // ── HASTES ──
+  if (key==='cefalo') {
+    rr(ctx,22,8,16,105,8,c.fill,c.stroke,c.lw);
+    ctx.save();ctx.translate(22,16);ctx.rotate(-0.22);
+    rr(ctx,-17,0,17,10,5,c.fill,c.stroke,c.lw);ctx.restore();
+    rr(ctx,22,110,16,9,4,c.fill2,c.stroke,c.lw);
+    rr(ctx,22,122,16,8,4,c.fill2,c.stroke,c.lw);
+    circ(ctx,30,8,7,c.fill,c.stroke,c.lw);
+  }
+  else if (key==='haste-fem') {
+    rr(ctx,19,8,10,106,5,c.fill,c.stroke,c.lw);
+    rr(ctx,19,110,10,9,4,c.fill2,c.stroke,c.lw);
+    rr(ctx,19,122,10,8,3.5,c.fill2,c.stroke,c.lw);
+    rr(ctx,14,128,20,9,4,c.fill,c.stroke,c.lw); // distal flare
+    circ(ctx,24,8,5,c.fill,c.stroke,c.lw);
+  }
+  else if (key==='haste-tib') {
+    rr(ctx,18,7,9,112,4.5,c.fill,c.stroke,c.lw);
+    rr(ctx,18,116,9,9,4,c.fill2,c.stroke,c.lw);
+    rr(ctx,18,128,9,8,3.5,c.fill2,c.stroke,c.lw);
+    circ(ctx,22.5,7,5,c.fill,c.stroke,c.lw);
+  }
+  // ── PLACAS ──
+  else if (key==='philos') {
+    rr(ctx,30,52,20,70,5,c.fill,c.stroke,c.lw);
+    rr(ctx,10,8,60,48,10,c.fill,c.stroke,c.lw);
+    [24,56].forEach(x=>[22,38].forEach(y=>circ(ctx,x,y,5.5,c.fill2,c.stroke,c.lw*0.7)));
+    [40].forEach(x=>[66,82,98].forEach(y=>circ(ctx,x,y,4.5,c.fill2,c.stroke,c.lw*0.7)));
+  }
+  else if (key==='joelho') {
+    rr(ctx,28,52,18,72,5,c.fill,c.stroke,c.lw);
+    rr(ctx,8,8,64,48,10,c.fill,c.stroke,c.lw);
+    [20,24,56,60].forEach((x,i)=>circ(ctx,x,i<2?22:38,5,c.fill2,c.stroke,c.lw*0.7));
+    [37].forEach(x=>[66,82,98,114].forEach(y=>circ(ctx,x,y,4,c.fill2,c.stroke,c.lw*0.7)));
+  }
+  else if (key==='lcp-ret') {
+    const n=7;
+    rr(ctx,4,14,202,16,6,c.fill,c.stroke,c.lw);
+    for(let i=0;i<n;i++) circ(ctx,18+i*28,22,6.5,c.fill2,c.stroke,c.lw*0.8);
+  }
+  else if (key==='lcp-curv') {
+    ctx.beginPath();ctx.moveTo(6,30);ctx.bezierCurveTo(40,8,100,8,140,22);ctx.bezierCurveTo(168,32,192,26,204,18);
+    ctx.lineWidth=14;ctx.strokeStyle=c.fill;ctx.stroke();
+    ctx.lineWidth=c.lw;ctx.strokeStyle=c.stroke;ctx.stroke();
+    [18,48,78,110,145,175,200].forEach((x,i)=>{
+      const y=[26,17,16,20,25,26,22][i];
+      circ(ctx,x,y,5.5,c.fill2,c.stroke,c.lw*0.7);
+    });
+  }
+  else if (key==='dcp') {
+    rr(ctx,3,13,204,12,4,c.fill,c.stroke,c.lw);
+    const holes=[18,46,74,102,130,158,186];
+    holes.forEach(x=>{
+      // oval DCP hole
+      ctx.beginPath();ctx.ellipse(x,19,7,4,0,0,Math.PI*2);
+      ctx.fillStyle=mode==='outline'?'transparent':c.fill2;ctx.fill();
+      ctx.strokeStyle=c.stroke;ctx.lineWidth=c.lw*0.8;ctx.stroke();
+    });
+  }
+  else if (key==='lcdcp') {
+    rr(ctx,3,13,204,12,4,c.fill,c.stroke,c.lw);
+    const holes=[18,46,74,102,130,158,186];
+    holes.forEach(x=>{
+      ctx.beginPath();ctx.ellipse(x,19,6,4,0,0,Math.PI*2);
+      ctx.fillStyle=mode==='outline'?'transparent':c.fill2;ctx.fill();
+      ctx.strokeStyle=c.stroke;ctx.lineWidth=c.lw*0.8;ctx.stroke();
+    });
+    // LC relief pattern (dashed underside)
+    ctx.setLineDash([3,3]);ln(ctx,8,24,196,24,c.stroke,c.lw*0.5);ctx.setLineDash([]);
+  }
+  else if (key==='neutr') {
+    rr(ctx,3,13,204,12,4,c.fill,c.stroke,c.lw);
+    [18,42,66,90,114,138,162,186].forEach(x=>circ(ctx,x,19,5,c.fill2,c.stroke,c.lw*0.7));
+  }
+  else if (key==='bridge') {
+    rr(ctx,3,13,254,12,4,c.fill,c.stroke,c.lw);
+    [18,44,70].forEach(x=>circ(ctx,x,19,5,c.fill2,c.stroke,c.lw*0.7));
+    [188,214,240].forEach(x=>circ(ctx,x,19,5,c.fill2,c.stroke,c.lw*0.7));
+    // Middle zone dashes = bridging gap
+    ctx.setLineDash([4,4]);ln(ctx,80,19,180,19,c.stroke,c.lw*0.6);ctx.setLineDash([]);
+  }
+  else if (key==='buttress') {
+    // L-shaped buttress plate
+    rr(ctx,10,8,42,80,6,c.fill,c.stroke,c.lw);
+    rr(ctx,10,85,42,38,6,c.fill,c.stroke,c.lw);
+    ctx.save();ctx.rotate(-Math.PI/10);
+    rr(ctx,8,85,44,12,4,c.fill2,c.stroke,c.lw*0.6);ctx.restore();
+    [22,32,42,52,62,72].forEach(y=>circ(ctx,31,y,4.5,c.fill2,c.stroke,c.lw*0.7));
+    [96,108].forEach(y=>circ(ctx,31,y,4.5,c.fill2,c.stroke,c.lw*0.7));
+  }
+  else if (key==='clav') {
+    ctx.beginPath();ctx.moveTo(6,22);ctx.bezierCurveTo(50,8,120,8,160,14);ctx.bezierCurveTo(178,18,192,16,194,18);
+    ctx.lineWidth=12;ctx.strokeStyle=c.fill;ctx.stroke();
+    ctx.lineWidth=c.lw;ctx.strokeStyle=c.stroke;ctx.stroke();
+    [16,42,68,96,124,150,180].forEach((x,i)=>{
+      const y=[18,14,13,14,15,16,17][i];
+      circ(ctx,x,y,5,c.fill2,c.stroke,c.lw*0.7);
+    });
+  }
+  else if (key==='pilao') {
+    // Distal tibial plate - L shape
+    rr(ctx,10,8,40,82,6,c.fill,c.stroke,c.lw);
+    rr(ctx,10,86,40,36,6,c.fill,c.stroke,c.lw);
+    [20,34,48,62,76].forEach(y=>circ(ctx,30,y,4.5,c.fill2,c.stroke,c.lw*0.7));
+    [96,110].forEach(y=>circ(ctx,30,y,4.5,c.fill2,c.stroke,c.lw*0.7));
+    // Distal locking screws (angulated)
+    ctx.save();ctx.translate(30,120);ctx.rotate(0.4);rr(ctx,-18,0,36,8,3,c.fill2,c.stroke,c.lw*0.6);ctx.restore();
+    ctx.save();ctx.translate(30,120);ctx.rotate(-0.4);rr(ctx,-18,0,36,8,3,c.fill2,c.stroke,c.lw*0.6);ctx.restore();
+  }
+  else if (key==='recon') {
+    ctx.beginPath();ctx.moveTo(8,28);ctx.quadraticCurveTo(60,4,110,28);ctx.quadraticCurveTo(160,52,212,28);
+    ctx.lineWidth=10;ctx.strokeStyle=c.fill;ctx.stroke();
+    ctx.lineWidth=c.lw;ctx.strokeStyle=c.stroke;ctx.stroke();
+    circ(ctx,36,16,5.5,c.fill2,c.stroke,c.lw*0.7);
+    circ(ctx,110,28,5.5,c.fill2,c.stroke,c.lw*0.7);
+    circ(ctx,184,40,5.5,c.fill2,c.stroke,c.lw*0.7);
+  }
+  else if (key==='dhs') {
+    rr(ctx,82,12,14,68,4,c.fill,c.stroke,c.lw);
+    [28,44,60,74].forEach(y=>circ(ctx,89,y,3.5,c.fill2,c.stroke,c.lw*0.7));
+    ctx.beginPath();ctx.moveTo(82,32);ctx.lineTo(6,60);ctx.lineWidth=13;ctx.strokeStyle=c.fill;ctx.stroke();
+    ctx.lineWidth=c.lw;ctx.strokeStyle=c.stroke;ctx.stroke();
+    circ(ctx,6,60,10,c.fill,c.stroke,c.lw);
+    ln(ctx,6,50,6,70,c.stroke,2.5);
+  }
+  // ── PRÓTESES ──
+  else if (key==='ptq') {
+    circ(ctx,41,22,20,c.fill,c.stroke,c.lw);
+    rr(ctx,34,40,14,76,7,c.fill,c.stroke,c.lw);
+    ctx.beginPath();ctx.moveTo(34,112);ctx.lineTo(18,150);ctx.lineTo(64,150);ctx.lineTo(50,112);
+    ctx.closePath();ctx.fillStyle=c.fill;ctx.fill();ctx.strokeStyle=c.stroke;ctx.lineWidth=c.lw;ctx.stroke();
+    ctx.beginPath();ctx.arc(64,55,18,Math.PI*0.3,Math.PI*1.2);
+    ctx.strokeStyle=c.cup;ctx.lineWidth=5;ctx.stroke();
+  }
+  else if (key==='ptqp') {
+    circ(ctx,35,21,19,c.fill,c.stroke,c.lw);
+    rr(ctx,28,38,14,72,7,c.fill,c.stroke,c.lw);
+    ctx.beginPath();ctx.moveTo(28,106);ctx.lineTo(16,146);ctx.lineTo(56,146);ctx.lineTo(44,106);
+    ctx.closePath();ctx.fillStyle=c.fill;ctx.fill();ctx.strokeStyle=c.stroke;ctx.lineWidth=c.lw;ctx.stroke();
+  }
+  // ── PARAFUSOS ──
+  else if (key==='sc-cortical') {
+    // Head (hex)
+    circ(ctx,6,7,5,c.fill,c.stroke,c.lw);
+    ln(ctx,4,7,8,7,c.stroke,1.5);ln(ctx,6,5,6,9,c.stroke,1.5);
+    // Shaft smooth
+    rr(ctx,4,12,4,24,2,c.fill,c.stroke,c.lw);
+    // Thread zone
+    for(let y=36;y<=56;y+=3) ln(ctx,2,y,10,y,c.stroke,0.8);
+    rr(ctx,3,36,6,22,1,c.fill,c.stroke,0.6);
+    // Tip
+    ctx.beginPath();ctx.moveTo(4,58);ctx.lineTo(8,58);ctx.lineTo(6,62);ctx.closePath();
+    ctx.fillStyle=c.fill;ctx.fill();ctx.strokeStyle=c.stroke;ctx.lineWidth=c.lw;ctx.stroke();
+  }
+  else if (key==='sc-locking') {
+    // Head with locking pattern
+    rr(ctx,2,2,8,8,2,c.fill,c.stroke,c.lw);
+    // Cross slot
+    ln(ctx,3,6,9,6,c.stroke,1.2);ln(ctx,6,3,6,9,c.stroke,1.2);
+    // Thread full length
+    rr(ctx,3,10,6,48,1.5,c.fill,c.stroke,c.lw);
+    for(let y=10;y<=56;y+=2.5) ln(ctx,2,y,10,y,c.stroke,0.7);
+    ctx.beginPath();ctx.moveTo(3,58);ctx.lineTo(9,58);ctx.lineTo(6,62);ctx.closePath();
+    ctx.fillStyle=c.fill;ctx.fill();ctx.strokeStyle=c.stroke;ctx.lineWidth=c.lw;ctx.stroke();
+  }
+  else if (key==='sc-esponj') {
+    // Large hex head
+    circ(ctx,7,8,6,c.fill,c.stroke,c.lw);
+    ln(ctx,4,8,10,8,c.stroke,1.5);ln(ctx,7,5,7,11,c.stroke,1.5);
+    // Smooth shaft (cancellous)
+    rr(ctx,4,14,6,20,2,c.fill,c.stroke,c.lw);
+    // Coarse thread
+    rr(ctx,3,34,8,24,1.5,c.fill,c.stroke,c.lw);
+    for(let y=34;y<=56;y+=4) ln(ctx,1,y,13,y,c.stroke,1);
+    ctx.beginPath();ctx.moveTo(4,58);ctx.lineTo(10,58);ctx.lineTo(7,62);ctx.closePath();
+    ctx.fillStyle=c.fill;ctx.fill();ctx.strokeStyle=c.stroke;ctx.lineWidth=c.lw;ctx.stroke();
+  }
+  else if (key==='sc-canuled') {
+    // Head
+    circ(ctx,7,7,6,c.fill,c.stroke,c.lw);
+    // Cannulation line
+    ln(ctx,7,2,7,62,c.stroke,1);
+    // Shaft
+    rr(ctx,3,13,8,44,2,c.fill,c.stroke,c.lw);
+    for(let y=28;y<=54;y+=3) ln(ctx,1,y,13,y,c.stroke,0.8);
+    // Cannula visible
+    ctx.setLineDash([2,2]);ln(ctx,7,14,7,58,c.stroke,1.5);ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(4,57);ctx.lineTo(10,57);ctx.lineTo(7,62);ctx.closePath();
+    ctx.fillStyle=c.fill;ctx.fill();ctx.strokeStyle=c.stroke;ctx.lineWidth=c.lw;ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  DRAW ALL PREVIEWS IN SIDEBAR
+// ═══════════════════════════════════════════════════════════════
+function drawPreviews() {
+  Object.keys(DEFS).forEach(key => {
+    const def = DEFS[key];
+    const cv = document.getElementById('pv-'+key);
+    if (!cv) return;
+    cv.width = def.pw; cv.height = def.ph;
+    const ctx = cv.getContext('2d');
+    ctx.clearRect(0,0,def.pw,def.ph);
+    drawShape(ctx, key, 'solid', def.pw, def.ph);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CANVAS + STATE
+// ═══════════════════════════════════════════════════════════════
+let canvas, ctx;
+let bgImg = null;
+let history = [];        // ImageData stack
+let measurements = [];
+let anglePoints = [];
+let overlayMode = 'solid';
+let mode = 'obj';
+let drawColor = '#ef4444';
+let drawing = false;
+let drawStart = {x:0,y:0};
+let drawSnap = null;
+let rxImgs = [];
+let curRxId = null;
+
+// Object layer — array of placed objects
+let objects = [];    // {id, key, x, y, scale, rot, flip}
+let selId = null;    // currently selected object id
+let dragging = false;
+let dragOx = 0, dragOy = 0;
+let pickedKey = null;
+
+let objIdCtr = 0;
+function newId() { return ++objIdCtr; }
+
+// ═══════════════════════════════════════════════════════════════
+//  CANVAS INIT
+// ═══════════════════════════════════════════════════════════════
+function initCanvas() {
+  canvas = document.getElementById('tpl');
+  ctx = canvas.getContext('2d');
+  resizeCanvas();
+  canvas.addEventListener('mousedown', onDown);
+  canvas.addEventListener('mousemove', onMove);
+  canvas.addEventListener('mouseup', onUp);
+  canvas.addEventListener('mouseleave', ()=>{ if(drawing||dragging) onUp(null); });
+  canvas.addEventListener('touchstart', e=>{e.preventDefault();const t=e.touches[0];onDown({clientX:t.clientX,clientY:t.clientY});},{passive:false});
+  canvas.addEventListener('touchmove',  e=>{e.preventDefault();const t=e.touches[0];onMove({clientX:t.clientX,clientY:t.clientY});},{passive:false});
+  canvas.addEventListener('touchend',   e=>{e.preventDefault();onUp({clientX:0,clientY:0});},{passive:false});
+}
+
+function resizeCanvas() {
+  if (!canvas) return;
+  const cf = document.getElementById('cf');
+  canvas.width  = cf.clientWidth || 700;
+  canvas.height = cf.clientHeight || 500;
+  render();
+}
+
+function cpos(e) {
+  const r = canvas.getBoundingClientRect();
+  return { x:(e.clientX-r.left)*(canvas.width/r.width), y:(e.clientY-r.top)*(canvas.height/r.height) };
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════════════════════
+function render() {
+  if (!ctx) return;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if (bgImg) ctx.drawImage(bgImg,0,0,canvas.width,canvas.height);
+  // Drawing annotations
+  if (history.length) ctx.putImageData(history[history.length-1],0,0);
+  // Objects (implants + screws)
+  objects.forEach(obj => drawObj(obj));
+}
+
+function drawObj(obj) {
+  const def = DEFS[obj.key];
+  if (!def) return;
+  const iw = def.cw * obj.scale;
+  const ih = def.ch * obj.scale;
+  // Offscreen render
+  const oc = document.createElement('canvas');
+  oc.width=def.cw; oc.height=def.ch;
+  drawShape(oc.getContext('2d'), obj.key, overlayMode, def.cw, def.ch);
+  ctx.save();
+  ctx.translate(obj.x, obj.y);
+  ctx.rotate(obj.rot * Math.PI/180);
+  if (obj.flip) ctx.scale(-1,1);
+  ctx.drawImage(oc, -iw/2, -ih/2, iw, ih);
+  // Selection ring
+  if (obj.id === selId) {
+    ctx.strokeStyle='rgba(96,165,250,0.9)';
+    ctx.lineWidth=1.5;
+    ctx.setLineDash([5,4]);
+    ctx.strokeRect(-iw/2-5, -ih/2-5, iw+10, ih+10);
+    ctx.setLineDash([]);
+  }
+  ctx.restore();
+}
+
+function saveSnap() {
+  if (!ctx) return;
+  // Render everything except objects into snapshot
+  const tmp = document.createElement('canvas');
+  tmp.width=canvas.width; tmp.height=canvas.height;
+  const tc = tmp.getContext('2d');
+  if (bgImg) tc.drawImage(bgImg,0,0,canvas.width,canvas.height);
+  if (history.length) tc.putImageData(history[history.length-1],0,0);
+  history.push(tc.getImageData(0,0,canvas.width,canvas.height));
+  if (history.length>30) history.shift();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  IMAGES
+// ═══════════════════════════════════════════════════════════════
+function addImgs(files) {
+  Array.from(files).forEach(f=>{
+    if (!f.type.startsWith('image/')) return;
+    const rd = new FileReader();
+    rd.onload = e=>{
+      const id=Date.now()+Math.random();
+      rxImgs.push({id,name:f.name,src:e.target.result});
+      renderStrip();
+      if (!curRxId) loadRx(id);
+      notify('📷 '+f.name);
+    };
+    rd.readAsDataURL(f);
+  });
+}
+function loadRx(id) {
+  curRxId=id;
+  const rx=rxImgs.find(r=>r.id===id);
+  if(!rx)return;
+  document.getElementById('noimg').classList.add('h');
+  const img=new Image();
+  img.onload=()=>{
+    bgImg=img;
+    if(!canvas)initCanvas();
+    const cf=document.getElementById('cf');
+    const sc=Math.min(cf.clientWidth/img.width,(cf.clientHeight||500)/img.height,1);
+    canvas.width=Math.round(img.width*sc);
+    canvas.height=Math.round(img.height*sc);
+    history=[];
+    render();
+    renderStrip();
+  };
+  img.src=rx.src;
+}
+function renderStrip() {
+  const s=document.getElementById('rxs');
+  const add=s.querySelector('.rxadd');
+  s.querySelectorAll('.rxt').forEach(t=>t.remove());
+  rxImgs.forEach(rx=>{
+    const d=document.createElement('div');
+    d.className='rxt'+(curRxId===rx.id?' on':'');
+    d.innerHTML=`<img src="${rx.src}"><button class="x" onclick="delRx(${rx.id},event)">✕</button>`;
+    d.onclick=()=>loadRx(rx.id);
+    s.insertBefore(d,add);
+  });
+}
+function delRx(id,e){
+  e.stopPropagation();
+  rxImgs=rxImgs.filter(r=>r.id!==id);
+  if(curRxId===id){
+    curRxId=null;bgImg=null;history=[];
+    if(rxImgs.length){loadRx(rxImgs[0].id);return;}
+    ctx&&ctx.clearRect(0,0,canvas.width,canvas.height);
+    document.getElementById('noimg').classList.remove('h');
+  }
+  renderStrip();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  OBJECT PICK & PLACE
+// ═══════════════════════════════════════════════════════════════
+function pickObj(key) {
+  pickedKey=key;
+  document.querySelectorAll('.ibt,.sbt').forEach(b=>b.classList.remove('on'));
+  const el=document.getElementById('ib-'+key)||document.getElementById('sb-'+key.replace('sc-',''));
+  if(el)el.classList.add('on');
+  setMode('obj');
+  canvas.style.cursor='crosshair';
+  notify('✦ '+DEFS[key].name+' — clique na RX para posicionar');
+}
+
+function placeObj(x,y) {
+  const obj={id:newId(), key:pickedKey, x, y, scale:1, rot:0, flip:false};
+  objects.push(obj);
+  selId=obj.id;
+  pickedKey=null;
+  document.querySelectorAll('.ibt,.sbt').forEach(b=>b.classList.remove('on'));
+  showTxBar(obj);
+  render();
+  renderObjList();
+  notify('✦ Posicionado — arraste para mover');
+}
+
+function hitTest(x,y) {
+  // Test in reverse (top objects first)
+  for(let i=objects.length-1;i>=0;i--) {
+    const obj=objects[i];
+    const def=DEFS[obj.key];
+    const hw=def.cw*obj.scale/2+8;
+    const hh=def.ch*obj.scale/2+8;
+    // Transform point into object local space
+    const dx=x-obj.x, dy=y-obj.y;
+    const rad=-obj.rot*Math.PI/180;
+    const lx=Math.cos(rad)*dx-Math.sin(rad)*dy;
+    const ly=Math.sin(rad)*dx+Math.cos(rad)*dy;
+    if(Math.abs(lx)<hw&&Math.abs(ly)<hh) return obj.id;
+  }
+  return null;
+}
+
+function showTxBar(obj) {
+  const bar=document.getElementById('txb');
+  bar.classList.remove('h');
+  document.getElementById('txb-name').textContent = DEFS[obj.key].name;
+  document.getElementById('isc').value=obj.scale;
+  document.getElementById('iro').value=obj.rot;
+  document.getElementById('isc-v').textContent=Math.round(obj.scale*100)+'%';
+  document.getElementById('iro-v').textContent=obj.rot+'°';
+  document.getElementById('fl-btn').classList.toggle('on',obj.flip);
+  updateRpObj(obj);
+}
+
+function hideTxBar() {
+  document.getElementById('txb').classList.add('h');
+  document.getElementById('rp-obj').textContent='Nenhum';
+}
+
+function updateRpObj(obj) {
+  document.getElementById('rp-obj').innerHTML=
+    `<div style="font-size:11px;font-weight:600;color:var(--t1);">${DEFS[obj.key].name}</div>
+     <div style="font-size:10px;color:var(--t3);margin-top:2px;">Esc ${Math.round(obj.scale*100)}% · Rot ${obj.rot}°${obj.flip?' · ⇄':''}</div>`;
+}
+
+function applyTx() {
+  const obj=objects.find(o=>o.id===selId);
+  if(!obj)return;
+  obj.scale=parseFloat(document.getElementById('isc').value);
+  obj.rot=parseInt(document.getElementById('iro').value);
+  document.getElementById('isc-v').textContent=Math.round(obj.scale*100)+'%';
+  document.getElementById('iro-v').textContent=obj.rot+'°';
+  updateRpObj(obj);
+  render();
+}
+
+function flipObj() {
+  const obj=objects.find(o=>o.id===selId);
+  if(!obj)return;
+  obj.flip=!obj.flip;
+  document.getElementById('fl-btn').classList.toggle('on',obj.flip);
+  updateRpObj(obj);
+  render();
+}
+
+function bakeObj() {
+  // Render all objects into drawing history
+  render();
+  const snap=ctx.getImageData(0,0,canvas.width,canvas.height);
+  // Now bake selected obj into history
+  objects=[]; selId=null;
+  history.push(snap);
+  hideTxBar();
+  render();
+  renderObjList();
+  notify('✓ Todos os implantes fixados na imagem');
+}
+
+function deleteObj() {
+  objects=objects.filter(o=>o.id!==selId);
+  selId=null;
+  hideTxBar();
+  render();
+  renderObjList();
+}
+
+function duplicateObj() {
+  const obj=objects.find(o=>o.id===selId);
+  if(!obj)return;
+  const copy={...obj, id:newId(), x:obj.x+20, y:obj.y+20};
+  objects.push(copy);
+  selId=copy.id;
+  showTxBar(copy);
+  render();
+  renderObjList();
+}
+
+function renderObjList() {
+  const el=document.getElementById('obj-list');
+  if(!objects.length){el.innerHTML='<div style="font-size:10px;color:var(--t3);text-align:center;padding:7px;">Vazio</div>';return;}
+  el.innerHTML=objects.map(o=>`
+    <div style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:5px;background:${selId===o.id?'rgba(59,130,246,.14)':'var(--s2)'};border:1px solid ${selId===o.id?'var(--ac)':'var(--b1)'};cursor:pointer;font-size:11px;" onclick="selectObj(${o.id})">
+      <span style="flex:1;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${DEFS[o.key].name}</span>
+      <span style="cursor:pointer;color:var(--t3);font-size:10px;" onclick="event.stopPropagation();deleteObjById(${o.id})">✕</span>
+    </div>`).join('');
+}
+
+function selectObj(id) {
+  selId=id;
+  const obj=objects.find(o=>o.id===id);
+  if(obj){showTxBar(obj);}
+  render();
+  renderObjList();
+}
+
+function deleteObjById(id) {
+  objects=objects.filter(o=>o.id!==id);
+  if(selId===id){selId=null;hideTxBar();}
+  render();
+  renderObjList();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MOUSE EVENTS
+// ═══════════════════════════════════════════════════════════════
+function onDown(e) {
+  if(!canvas||!bgImg)return;
+  const {x,y}=cpos(e);
+
+  if(mode==='obj') {
+    if(pickedKey){placeObj(x,y);return;}
+    const hit=hitTest(x,y);
+    if(hit!==null){
+      selId=hit;
+      const obj=objects.find(o=>o.id===hit);
+      showTxBar(obj);
+      dragging=true; dragOx=x-obj.x; dragOy=y-obj.y;
+      canvas.style.cursor='grabbing';
+      render();renderObjList();return;
+    }
+    // Click empty area — deselect
+    selId=null;hideTxBar();render();renderObjList();return;
+  }
+
+  if(mode==='angle'){
+    anglePoints.push({x,y});
+    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle=drawColor;ctx.fill();
+    if(anglePoints.length===3)finishAngle();
+    return;
+  }
+  if(mode==='txt'){
+    const t=prompt('Texto:');if(!t)return;
+    const sz=parseInt(document.getElementById('dsz').value)||2;
+    ctx.font=`bold ${10+sz*2}px IBM Plex Mono`;ctx.fillStyle=drawColor;
+    ctx.fillText(t,x,y);
+    saveSnap();render();return;
+  }
+  drawing=true; drawStart={x,y};
+  drawSnap=ctx.getImageData(0,0,canvas.width,canvas.height);
+  if(mode==='draw'){ctx.beginPath();ctx.moveTo(x,y);}
+}
+
+function onMove(e) {
+  if(!canvas)return;
+  const {x,y}=cpos(e);
+  if(dragging&&selId!==null){
+    const obj=objects.find(o=>o.id===selId);
+    if(obj){obj.x=x-dragOx;obj.y=y-dragOy;}
+    render();return;
+  }
+  if(!drawing)return;
+  const sz=parseInt(document.getElementById('dsz').value)||2;
+  ctx.strokeStyle=drawColor;ctx.lineWidth=sz;ctx.lineCap='round';ctx.lineJoin='round';
+  if(mode==='draw'){ctx.lineTo(x,y);ctx.stroke();}
+  else if(mode==='line'||mode==='meas'){
+    ctx.putImageData(drawSnap,0,0);
+    objects.forEach(o=>drawObj(o));
+    ctx.beginPath();ctx.moveTo(drawStart.x,drawStart.y);ctx.lineTo(x,y);ctx.stroke();
+  }
+}
+
+function onUp(e) {
+  if(dragging){dragging=false;canvas.style.cursor=mode==='obj'?'default':'crosshair';saveSnap();return;}
+  if(!drawing)return;
+  drawing=false;
+  if(e&&mode==='meas'){
+    const {x,y}=cpos(e);
+    const px=Math.hypot(x-drawStart.x,y-drawStart.y).toFixed(1);
+    const sz=parseInt(document.getElementById('dsz').value)||2;
+    ctx.font=`bold ${9+sz}px IBM Plex Mono`;ctx.fillStyle=drawColor;
+    ctx.fillText(`${px}px`,(drawStart.x+x)/2+4,(drawStart.y+y)/2-4);
+    measurements.push({label:'Dist.',val:`${px} px`,color:drawColor});
+    renderMeas();
+  }
+  saveSnap();render();
+}
+
+function finishAngle() {
+  const p=anglePoints;anglePoints=[];
+  const sz=parseInt(document.getElementById('dsz').value)||2;
+  ctx.strokeStyle=drawColor;ctx.lineWidth=sz;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(p[0].x,p[0].y);ctx.lineTo(p[1].x,p[1].y);ctx.lineTo(p[2].x,p[2].y);ctx.stroke();
+  const v1={x:p[0].x-p[1].x,y:p[0].y-p[1].y};
+  const v2={x:p[2].x-p[1].x,y:p[2].y-p[1].y};
+  const dot=v1.x*v2.x+v1.y*v2.y;
+  const mag=Math.hypot(v1.x,v1.y)*Math.hypot(v2.x,v2.y);
+  const deg=(Math.acos(Math.min(1,dot/mag))*180/Math.PI).toFixed(1);
+  ctx.font='bold 12px IBM Plex Mono';ctx.fillStyle=drawColor;
+  ctx.fillText(`${deg}°`,p[1].x+8,p[1].y-5);
+  measurements.push({label:'Ângulo',val:`${deg}°`,color:drawColor});
+  renderMeas();saveSnap();render();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TOOLBAR
+// ═══════════════════════════════════════════════════════════════
+function setMode(m) {
+  mode=m;anglePoints=[];
+  document.querySelectorAll('[id^=m-]').forEach(b=>b.classList.remove('on'));
+  document.getElementById('m-'+m)?.classList.add('on');
+  if(canvas) canvas.style.cursor=m==='obj'?'default':'crosshair';
+}
+function setDC(c,el) {
+  drawColor=c;
+  document.querySelectorAll('.csw').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+}
+function setOv(m) {
+  overlayMode=m;
+  document.querySelectorAll('[id^=ov-]').forEach(b=>b.classList.remove('on'));
+  document.getElementById('ov-'+m)?.classList.add('on');
+  render();
+}
+function undo() {
+  if(history.length<=0){notify('Nada para desfazer');return;}
+  history.pop();
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(bgImg)ctx.drawImage(bgImg,0,0,canvas.width,canvas.height);
+  if(history.length)ctx.putImageData(history[history.length-1],0,0);
+  objects.forEach(o=>drawObj(o));
+}
+function clearAll() {
+  history=[];
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(bgImg)ctx.drawImage(bgImg,0,0,canvas.width,canvas.height);
+  objects.forEach(o=>drawObj(o));
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MEASUREMENTS
+// ═══════════════════════════════════════════════════════════════
+function renderMeas() {
+  const row=document.getElementById('measrow');
+  const list=document.getElementById('measlist');
+  if(!measurements.length){row.style.display='none';return;}
+  row.style.display='block';
+  list.innerHTML=measurements.map((m,i)=>`
+    <div style="display:flex;align-items:center;gap:6px;padding:4px 8px;background:var(--s2);border-radius:5px;font-size:11px;">
+      <div style="width:8px;height:8px;border-radius:50%;background:${m.color};flex-shrink:0;"></div>
+      <span style="color:var(--t2);">${m.label}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;color:var(--ac2);">${m.val}</span>
+      <span style="cursor:pointer;color:var(--t3);margin-left:3px;" onclick="measurements.splice(${i},1);renderMeas()">✕</span>
+    </div>`).join('');
+}
+function clrMeas(){measurements=[];renderMeas();}
+
+// ═══════════════════════════════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════════════════════════════
+function exportImg() {
+  if(!canvas||!bgImg){notify('⚠️ Carregue uma imagem');return;}
+  render(); // ensure latest state
+  const a=document.createElement('a');
+  a.href=canvas.toDataURL('image/jpeg',0.95);
+  a.download=`template_${(document.getElementById('pnome').value||'paciente').replace(/\s/g,'_')}.jpg`;
+  a.click();
+  notify('📸 Imagem exportada!');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+function showPg(n){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.getElementById('pg-'+n).classList.add('on');
+  if(n==='tpl'){setTimeout(()=>{if(!canvas)initCanvas();drawPreviews();},60);}
+  if(n==='lista')renderCasos();
+}
+function setA(el){document.querySelectorAll('.sni').forEach(i=>i.classList.remove('on'));if(el)el.classList.add('on');}
+function stab(el,id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');
+  ['td','tf','ti','tp'].forEach(t=>{const e=document.getElementById(t);if(e)e.style.display=t===id?'block':'none';});
+  if(id==='tf')renderFR();if(id==='tp')renderSteps();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  FORM / DATA
+// ═══════════════════════════════════════════════════════════════
+function upH(){
+  const n=document.getElementById('pnome').value||'Novo Paciente';
+  const i=document.getElementById('pidade').value;
+  const c=document.getElementById('pcir').value;
+  const d=document.getElementById('pdcir').value;
+  document.getElementById('dn').textContent=n+(i?` — ${i} anos`:'');
+  document.getElementById('dc').textContent=c||'—';
+  if(d){const dd=new Date(d+'T12:00:00');document.getElementById('dd').textContent=dd.toLocaleDateString('pt-BR');}
+  upRisk();
+}
+function setReg(r){
+  document.getElementById('preg').value=r;
+  document.getElementById('dr').textContent=r;
+  showPg('plan');setA(document.getElementById('sn0'));
+  renderFR();renderSteps();
+}
+function setRegSel(){document.getElementById('dr').textContent=document.getElementById('preg').value;}
+function selQI(el){document.querySelectorAll('.iqc').forEach(c=>{c.style.borderColor='';c.style.background='';});el.style.borderColor='var(--ac)';el.style.background='rgba(59,130,246,.12)';}
+
+const aoMap={'31':'Fêmur Proximal','32':'Fêmur Diáfise','41':'Tíbia Proximal','42':'Tíbia Diáfise','43':'Tíbia Distal','44':'Tornozelo','61':'Pelve','62':'Acetábulo','11':'Úmero Proximal','12':'Úmero Diáfise','13':'Úmero Distal','21':'Antebraço Proximal','23':'Rádio Distal'};
+const tDesc={'A':'Extra-articular','B':'Parcialmente articular','C':'Completamente articular'};
+function interpAO(){
+  const v=document.getElementById('pao').value.trim();
+  const el=document.getElementById('aobox');
+  if(!v||v.length<2){el.style.display='none';return;}
+  const reg=aoMap[v.substring(0,2)];
+  if(!reg){el.style.display='none';return;}
+  const t=v.includes('-')?v.split('-')[1]?.charAt(0):'';
+  el.style.display='block';
+  el.innerHTML=`<b>🔍 AO:</b> ${v.substring(0,2)} → ${reg}${t?`<br>Tipo <b>${t}</b>: ${tDesc[t]||''}`:''}`; 
+}
+
+const regMap={
+  'Fêmur Proximal':['Cabeça femoral','Colo femoral','Grande trocânter','Intertrocantérica','Subtrocantérica'],
+  'Quadril / Acetábulo':['Coluna anterior','Coluna posterior','Parede anterior','Parede posterior','Fratura em T'],
+  'Fêmur Diáfise':['Terço proximal','Terço médio','Terço distal','Supracondilar'],
+  'Platô Tibial':['Côndilo lateral','Côndilo medial','Bicondilar','Depressão central'],
+  'Tornozelo / Pilão':['Maléolo lateral','Maléolo medial','Posterior','Sindesmose','Pilão'],
+  'Úmero Proximal':['Cabeça','Colo anatômico','Colo cirúrgico','Grande tubérculo','Pequeno tubérculo'],
+  'Antebraço':['Rádio proximal','Diáfise rádio','Rádio distal','Olécrano','Diáfise ulna'],
+  'Pelve / Anel Pélvico':['Ilíaco','Sacro','Sínfise púbica','Ramo isquiopúbico'],
+};
+function renderFR(){
+  const r=document.getElementById('preg').value;
+  const c=document.getElementById('freg');if(!c)return;
+  c.innerHTML=(regMap[r]||[]).map(x=>`<div class="frb" onclick="this.classList.toggle('on')">${x}</div>`).join('');
+}
+
+const sMap={
+  'Fêmur Proximal':[{t:'Mesa ortopédica / tração',d:'Fluoroscopia AP e perfil'},{t:'Ponto de entrada trocantérico',d:'Fossa piriforme'},{t:'Fio-guia e fresagem',d:'Eixo e tamanho'},{t:'Inserção da haste',d:'Comprimento, rotação, alinhamento'},{t:'Parafuso cefálico',d:'TAD ≤ 25 mm'},{t:'Bloqueio distal',d:'Estático ou dinâmico'},{t:'Fluoroscopia final + fechamento',d:'AP, perfil, oblíqua'}],
+  default:[{t:'Antissepsia e posicionamento',d:'Check equipamentos'},{t:'Abordagem cirúrgica',d:'Estruturas nobres'},{t:'Redução da fratura',d:'Anatômica/funcional'},{t:'Fixação definitiva',d:'Implante + fluoroscopia'},{t:'Verificação de estabilidade',d:'Movimentos, controle RX'},{t:'Fechamento por planos',d:'Hemostasia, curativo'}]
+};
+function renderSteps(){
+  const r=document.getElementById('preg').value;
+  const steps=sMap[r]||sMap.default;
+  const c=document.getElementById('sbox');if(!c)return;
+  c.innerHTML=steps.map((s,i)=>`
+    <div class="si">
+      <div class="sn">${i+1}</div>
+      <div style="flex:1"><div style="font-size:12px;font-weight:500;margin-bottom:2px;">${s.t}</div><div style="font-size:10px;color:var(--t2);">${s.d}</div></div>
+      <span style="cursor:pointer;font-size:13px;color:var(--t3);" onclick="this.textContent=this.textContent==='⬜'?'✅':'⬜';this.style.color=this.textContent==='✅'?'var(--gr)':'var(--t3)'">⬜</span>
+    </div>`).join('');
+}
+function addStep(){
+  const c=document.getElementById('sbox');
+  const d=document.createElement('div');d.className='si';
+  d.innerHTML=`<div class="sn" style="background:var(--t3)">+</div><div style="flex:1"><input type="text" placeholder="Passo..." style="width:100%;margin-bottom:3px;font-size:12px;"><input type="text" placeholder="Detalhe..." style="width:100%;font-size:12px;"></div><span style="cursor:pointer;color:var(--re);font-size:13px;" onclick="this.parentElement.remove()">✕</span>`;
+  c.appendChild(d);
+}
+
+// RISK
+function upRisk(){
+  let s=20;
+  const t=document.getElementById('ptipo')?.value;
+  if(t==='B')s+=15;if(t==='C')s+=30;
+  const g=document.getElementById('pgust')?.value;
+  if(g==='1')s+=5;if(g==='2')s+=12;if(g==='3A')s+=22;if(g==='3B')s+=32;if(g==='3C')s+=42;
+  const u=document.getElementById('purg')?.value;
+  if(u?.includes('Urgência'))s+=10;if(u?.includes('Emergência'))s+=20;
+  if(document.getElementById('cdm')?.checked)s+=8;
+  if(document.getElementById('costeo')?.checked)s+=6;
+  if(document.getElementById('cantic')?.checked)s+=7;
+  if(document.getElementById('circ')?.checked)s+=8;
+  if(document.getElementById('cobes')?.checked)s+=5;
+  s=Math.min(s,100);
+  document.getElementById('gv').textContent=s;
+  let col,ti,su;
+  if(s<30){col='var(--gr)';ti='Baixo';su='Protocolo padrão';}
+  else if(s<55){col='var(--go)';ti='Moderado';su='Planejamento detalhado';}
+  else if(s<75){col='var(--or)';ti='Alto';su='Equipe experiente, UTI';}
+  else{col='var(--re)';ti='Crítico';su='Considerar DCO';}
+  const deg=Math.round((s/100)*300);
+  document.getElementById('gc').style.background=`conic-gradient(${col} 0deg ${deg}deg, var(--b1) ${deg}deg 360deg)`;
+  document.getElementById('gv').style.color=col;
+  document.getElementById('gt').textContent=ti;
+  document.getElementById('gs').textContent=su;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SAVE / LIST
+// ═══════════════════════════════════════════════════════════════
+let casos=JSON.parse(localStorage.getItem('ortho_v5')||'[]');
+function salvar(){
+  const sel=objects.find(o=>o.id===selId);
+  casos.push({
+    id:Date.now(),nome:document.getElementById('pnome').value||'Paciente',
+    regiao:document.getElementById('preg').value,ao:document.getElementById('pao').value||'—',
+    data:document.getElementById('pdcir').value,cirurgiao:document.getElementById('pcir').value||'—',
+    urgencia:document.getElementById('purg').value,
+    implante:sel?DEFS[sel.key].name:`${objects.length} obj.`,imgs:rxImgs.length
+  });
+  localStorage.setItem('ortho_v5',JSON.stringify(casos));notify('✅ Salvo!');
+}
+function renderCasos(){
+  const t=document.getElementById('ctb');
+  if(!casos.length){t.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:20px;">Nenhum.</td></tr>';return;}
+  t.innerHTML=casos.map(c=>{
+    const sc=c.urgencia?.includes('Emergência')?'ur':c.urgencia?.includes('Urgência')?'pe':'pl';
+    const sl=c.urgencia?.includes('Emergência')?'Emergência':c.urgencia?.includes('Urgência')?'Urgência':'Eletiva';
+    const df=c.data?new Date(c.data+'T12:00:00').toLocaleDateString('pt-BR'):'—';
+    return `<tr><td style="color:var(--t1)">${c.nome}</td><td>${c.regiao}</td><td style="font-family:'IBM Plex Mono',monospace;font-size:11px;">${c.ao}</td><td>${df}</td><td>${c.cirurgiao}</td><td><span class="sp ${sc}">${sl}</span></td><td><button class="btn bg bsm" onclick="delCaso(${c.id})">✕</button></td></tr>`;
+  }).join('');
+}
+function delCaso(id){casos=casos.filter(c=>c.id!==id);localStorage.setItem('ortho_v5',JSON.stringify(casos));renderCasos();}
+function novoPlano(){limpar();showPg('plan');setA(document.getElementById('sn0'));}
+function limpar(){
+  ['pnome','pcir','ppront','pobs','pao','pidade'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['pdcir'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['cdm','chta','costeo','cantic','circ','cobes'].forEach(id=>{const e=document.getElementById(id);if(e)e.checked=false;});
+  rxImgs=[];curRxId=null;bgImg=null;objects=[];selId=null;measurements=[];history=[];
+  if(ctx)ctx.clearRect(0,0,canvas?.width||1,canvas?.height||1);
+  document.getElementById('noimg')?.classList.remove('h');
+  hideTxBar();upH();upRisk();renderObjList();notify('🔄 Limpo.');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PDF
+// ═══════════════════════════════════════════════════════════════
+function gerarPDF(){
+  const nome=document.getElementById('pnome').value||'Paciente';
+  const regiao=document.getElementById('preg').value;
+  const ao=document.getElementById('pao').value||'—';
+  const cir=document.getElementById('pcir').value||'—';
+  const data=document.getElementById('pdcir').value;
+  const df=data?new Date(data+'T12:00:00').toLocaleDateString('pt-BR'):'—';
+  const obs=document.getElementById('pobs').value||'—';
+  const idade=document.getElementById('pidade').value||'—';
+  const urg=document.getElementById('purg').value;
+  const steps=sMap[regiao]||sMap.default;
+  const imgHtml=(canvas&&bgImg)?`<img src="${canvas.toDataURL('image/jpeg',.92)}" style="max-width:100%;border:1px solid #ddd;border-radius:6px;">`:'<p style="color:#999;">Nenhum template</p>';
+  const objsHtml=objects.length?objects.map(o=>`<tr><td>${DEFS[o.key].name}</td><td>${DEFS[o.key].cat}</td><td>${Math.round(o.scale*100)}%</td><td>${o.rot}°</td><td>${o.flip?'Sim':'Não'}</td></tr>`).join(''):'<tr><td colspan="5" style="color:#999;">Nenhum</td></tr>';
+  const measHtml=measurements.length?measurements.map(m=>`<tr><td>${m.label}</td><td>${m.val}</td></tr>`).join(''):'<tr><td colspan="2" style="color:#999;">Nenhuma</td></tr>';
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Planejamento — ${nome}</title>
+  <style>body{font-family:Arial,sans-serif;max-width:800px;margin:36px auto;color:#222;font-size:13px;line-height:1.6;}
+  h1{font-size:18px;color:#1d4ed8;border-bottom:2px solid #1d4ed8;padding-bottom:6px;margin-bottom:16px;}
+  h2{font-size:11px;background:#eff6ff;padding:5px 8px;border-left:4px solid #1d4ed8;margin-top:18px;text-transform:uppercase;}
+  table{width:100%;border-collapse:collapse;margin-top:6px;font-size:12px;}
+  td,th{border:1px solid #ddd;padding:6px 8px;}th{background:#f0f4ff;font-weight:600;}
+  .footer{margin-top:32px;font-size:10px;color:#aaa;text-align:center;border-top:1px solid #eee;padding-top:9px;}
+  @media print{body{margin:16px;}}</style></head><body>
+  <h1>🦴 OrthoPlanner v5 — Planejamento Cirúrgico + Templating Digital</h1>
+  <p style="color:#666;font-size:11px;">Gerado: ${new Date().toLocaleString('pt-BR')}</p>
+  <h2>1. Identificação</h2>
+  <table><tr><th>Campo</th><th>Valor</th></tr>
+    <tr><td>Paciente</td><td>${nome}</td></tr><tr><td>Idade</td><td>${idade} anos</td></tr>
+    <tr><td>Cirurgião</td><td>${cir}</td></tr><tr><td>Região</td><td>${regiao}</td></tr>
+    <tr><td>AO/OTA</td><td>${ao}</td></tr><tr><td>Urgência</td><td>${urg}</td></tr>
+    <tr><td>Data prevista</td><td>${df}</td></tr>
+  </table>
+  <h2>2. Observações</h2><p>${obs}</p>
+  <h2>3. Template Digital</h2>${imgHtml}
+  <h2>4. Implantes e Parafusos Posicionados</h2>
+  <table><tr><th>Implante</th><th>Tipo</th><th>Escala</th><th>Rotação</th><th>Espelhado</th></tr>${objsHtml}</table>
+  <h2>5. Medições Radiográficas</h2><table><tr><th>Tipo</th><th>Valor</th></tr>${measHtml}</table>
+  <h2>6. Passos Cirúrgicos</h2>
+  <table><tr><th>#</th><th>Passo</th><th>Detalhe</th></tr>${steps.map((s,i)=>`<tr><td>${i+1}</td><td>${s.t}</td><td>${s.d}</td></tr>`).join('')}</table>
+  <div class="footer">OrthoPlanner v5.0 · Uso interno hospitalar · Não substitui julgamento clínico · AO/OTA 2018</div>
+  </body></html>`;
+  const w=window.open('','_blank');w.document.write(html);w.document.close();setTimeout(()=>w.print(),700);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  NOTIFY + INIT
+// ═══════════════════════════════════════════════════════════════
+function notify(msg){
+  const el=document.getElementById('notif');el.textContent=msg;el.classList.add('on');
+  setTimeout(()=>el.classList.remove('on'),3000);
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  upRisk();renderFR();renderSteps();
+  setTimeout(drawPreviews,120);
+  window.addEventListener('resize',resizeCanvas);
+});
+</script>
+</body>
+</html>
